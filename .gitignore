@@ -1,0 +1,30 @@
+# Secrets / local config
+.env
+.env.*
+.env*.local
+!.env.example
+!.env.local.example
+*.pem
+
+# Dependencies & Build
+node_modules/
+.next/
+out/
+build/
+dist/
+*.tsbuildinfo
+
+# Python / DB / Scratch
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.db
+*.sqlite*
+.agent-notes.txt
+playwright-report/
+test-results/
+
+# IDE
+.idea/
+.vscode/

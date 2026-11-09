@@ -1,0 +1,93 @@
+@import 'tailwindcss';
+@plugin "tailwindcss-animate";
+
+/* Class-based dark mode (toggled by uiStore in Step 4+), not OS-preference-based. */
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+  --font-display: var(--font-fraunces), Georgia, serif;
+  --font-sans: var(--font-plex-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, monospace;
+
+  /* Base surfaces */
+  --color-background: #f7f6f3;
+  --color-foreground: #221b17;
+  --color-surface: #ffffff;
+  --color-border: #e4e0d9;
+
+  /* Roast - primary brand/accent (roasted walnut, deliberately not terracotta) */
+  --color-roast-50: #fbf3ec;
+  --color-roast-100: #f3e1d2;
+  --color-roast-200: #e6c6a8;
+  --color-roast-300: #d9ae87;
+  --color-roast-400: #b87e4f;
+  --color-roast-500: #9c5f35;
+  --color-roast-600: #7c4a29;
+  --color-roast-700: #5e381f;
+  --color-roast-800: #452a17;
+  --color-roast-900: #33200f;
+
+  /* Sage - success / positive stock */
+  --color-sage-50: #f1f5f0;
+  --color-sage-100: #dfe9dd;
+  --color-sage-300: #a9c4a4;
+  --color-sage-500: #6b8f71;
+  --color-sage-600: #557459;
+  --color-sage-700: #45614a;
+
+  /* Amber - warning / pending */
+  --color-amber-50: #fdf4e3;
+  --color-amber-100: #f8e3b8;
+  --color-amber-300: #e9c077;
+  --color-amber-500: #c98a2c;
+  --color-amber-600: #a8721f;
+  --color-amber-700: #925e17;
+
+  /* Brick - destructive / failed */
+  --color-brick-50: #fbeded;
+  --color-brick-100: #f2d3d1;
+  --color-brick-300: #de9c97;
+  --color-brick-500: #a23b3b;
+  --color-brick-600: #8a3232;
+  --color-brick-700: #7a2a2a;
+
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+}
+
+.dark {
+  --color-background: #1c1613;
+  --color-foreground: #ede7de;
+  --color-surface: #241d19;
+  --color-border: #3a2e27;
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+  }
+
+  /* Visible keyboard focus everywhere - never remove outline without replacing it. */
+  :focus-visible {
+    outline: 2px solid var(--color-roast-500);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
