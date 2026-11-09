@@ -8,6 +8,8 @@ const nextConfig: NextConfig = {
       { protocol: 'http', hostname: 'localhost', port: '8000', pathname: '/api/media/**' },
       { protocol: 'http', hostname: '127.0.0.1', port: '8000', pathname: '/api/media/**' },
       { protocol: 'http', hostname: 'kong', port: '8000', pathname: '/api/media/**' },
+      { protocol: 'https', hostname: '**.up.railway.app', pathname: '/api/media/**' },
+      { protocol: 'https', hostname: '**.up.railway.app', pathname: '/media/**' },
     ],
   },
 };
