@@ -14,10 +14,11 @@ interface PageProps {
 async function fetchProductServer(
   id: string,
 ): Promise<{ status: number; product: ProductResponse | null }> {
-  const internalApi = (process.env.INTERNAL_API_BASE_URL || 'http://kong:8000').replace(
-    /\/$/,
-    '',
-  );
+  const internalApi = (
+    process.env.KONG_INTERNAL_URL ||
+    process.env.INTERNAL_API_BASE_URL ||
+    'http://kong:8000'
+  ).replace(/\/$/, '');
   try {
     const res = await fetch(`${internalApi}/api/products/${encodeURIComponent(id)}`, {
       cache: 'no-store',

@@ -34,7 +34,11 @@ async function serveDefaultFallbackImage(): Promise<Response> {
 
 export async function GET(_request: Request, { params }: RouteContext): Promise<Response> {
   const { id } = await params;
-  const internalApi = (process.env.INTERNAL_API_BASE_URL || 'http://kong:8000').replace(/\/$/, '');
+  const internalApi = (
+    process.env.KONG_INTERNAL_URL ||
+    process.env.INTERNAL_API_BASE_URL ||
+    'http://kong:8000'
+  ).replace(/\/$/, '');
 
   let product: {
     id: number;

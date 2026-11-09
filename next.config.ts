@@ -10,19 +10,6 @@ const nextConfig: NextConfig = {
       { protocol: 'http', hostname: 'kong', port: '8000', pathname: '/api/media/**' },
     ],
   },
-  async rewrites() {
-    const gatewayOrigin = (
-      process.env.INTERNAL_API_BASE_URL ||
-      process.env.NEXT_PUBLIC_API_BASE_URL ||
-      'http://localhost:8000'
-    ).replace(/\/$/, '');
-    return [
-      {
-        source: '/api/media/:path*',
-        destination: `${gatewayOrigin}/api/media/:path*`,
-      },
-    ];
-  },
 };
 
 export default nextConfig;

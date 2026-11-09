@@ -6,13 +6,18 @@ import { attachInterceptors } from '@/services/interceptor';
 const REQUEST_TIMEOUT_MS = 15000;
 
 function resolveBaseUrl(): string {
-  // When running server-side (e.g. Next.js SSR / Server Actions) inside a container,
-  // localhost would resolve to the frontend container itself. We must call Kong via
-  // the Docker network service name http://kong:8000. In client browser, use localhost:8000.
+  // When running server-side (e.g. Next.js SSR / Server Actions / Route Handlers),
+  // call Kong via KONG_INTERNAL_URL or INTERNAL_API_BASE_URL. In browser, use NEXT_PUBLIC_API_BASE_URL
+  // or relative paths (empty string) for same-origin proxy.
   if (typeof window === 'undefined') {
-    return env.INTERNAL_API_BASE_URL || 'http://kong:8000';
+    return (
+      process.env.KONG_INTERNAL_URL ||
+      process.env.INTERNAL_API_BASE_URL ||
+      env.INTERNAL_API_BASE_URL ||
+      'http://kong:8000'
+    );
   }
-  return env.NEXT_PUBLIC_API_BASE_URL;
+  return env.NEXT_PUBLIC_API_BASE_URL || '';
 }
 
 function createApiClient(): AxiosInstance {
