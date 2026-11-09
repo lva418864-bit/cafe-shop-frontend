@@ -20,7 +20,7 @@ export function resolveProductImageUrl(imageUrl?: string | null): string | null 
   ) {
     return trimmed;
   }
-  const baseUrl = (env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000').replace(/\/$/, '');
+  const baseUrl = (env.NEXT_PUBLIC_API_BASE_URL || '').replace(/\/$/, '');
   const normalizedPath = trimmed.startsWith('/') ? trimmed : `/${trimmed}`;
-  return `${baseUrl}${normalizedPath}`;
+  return baseUrl ? `${baseUrl}${normalizedPath}` : normalizedPath;
 }

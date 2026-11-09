@@ -5,14 +5,27 @@ import { z } from 'zod';
  * unified API entry point (port 8000 by default).
  */
 const envSchema = z.object({
-  NEXT_PUBLIC_API_BASE_URL: z.string().url(),
+  // When empty or omitted, client browser calls same-origin relative URLs (/api/..., /media/...)
+  NEXT_PUBLIC_API_BASE_URL: z.string().url().or(z.literal('')).default(''),
   INTERNAL_API_BASE_URL: z.string().url().optional(),
+  KONG_INTERNAL_URL: z.string().url().optional(),
 });
 
 function loadEnv() {
+  const isDev = process.env.NODE_ENV !== 'production';
+  const defaultApiBase = isDev ? 'http://localhost:8000' : '';
+  const rawApiBase =
+    process.env.NEXT_PUBLIC_API_BASE_URL !== undefined
+      ? process.env.NEXT_PUBLIC_API_BASE_URL
+      : defaultApiBase;
+
   const parsed = envSchema.safeParse({
-    NEXT_PUBLIC_API_BASE_URL: process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000',
-    INTERNAL_API_BASE_URL: process.env.INTERNAL_API_BASE_URL || 'http://kong:8000',
+    NEXT_PUBLIC_API_BASE_URL: rawApiBase,
+    INTERNAL_API_BASE_URL:
+      process.env.INTERNAL_API_BASE_URL ||
+      process.env.KONG_INTERNAL_URL ||
+      (isDev ? 'http://localhost:8000' : 'http://kong:8000'),
+    KONG_INTERNAL_URL: process.env.KONG_INTERNAL_URL,
   });
 
   if (!parsed.success) {
