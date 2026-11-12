@@ -4,45 +4,19 @@ import {
   buildProductOgDescription,
   resolveProductOgImage,
 } from '@/features/product/metadata';
-import type { ProductResponse } from '@/features/product/types';
+import { fetchProductServer } from '@/features/product/server';
+import { buildCanonicalProductUrl, getRobotsDirective, getSiteUrl } from '@/lib/site';
+import { safeJsonLdStringify } from '@/lib/jsonLd';
 import { ProductDetailClient } from './product-detail-client';
 
 interface PageProps {
   params: Promise<{ id: string }>;
 }
 
-async function fetchProductServer(
-  id: string,
-): Promise<{ status: number; product: ProductResponse | null }> {
-  const internalApi = (
-    process.env.KONG_INTERNAL_URL ||
-    process.env.INTERNAL_API_BASE_URL ||
-    'http://kong:8000'
-  ).replace(/\/$/, '');
-  try {
-    const res = await fetch(`${internalApi}/api/products/${encodeURIComponent(id)}`, {
-      cache: 'no-store',
-      headers: { Accept: 'application/json' },
-    });
-    if (!res.ok) {
-      return { status: res.status || 404, product: null };
-    }
-    const payload = await res.json();
-    const product = (payload?.data as ProductResponse | undefined) ?? null;
-    return { status: product ? 200 : 404, product };
-  } catch {
-    return { status: 503, product: null };
-  }
-}
-
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { id } = await params;
-  const baseUrl = (
-    process.env.PUBLIC_BASE_URL ||
-    process.env.NEXT_PUBLIC_BASE_URL ||
-    'http://localhost:3000'
-  ).replace(/\/$/, '');
-  const productUrl = `${baseUrl}/products/${encodeURIComponent(id)}`;
+  const baseUrl = getSiteUrl();
+  const productUrl = buildCanonicalProductUrl(id);
 
   const { product } = await fetchProductServer(id);
   if (!product) {
@@ -58,6 +32,18 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const title = `${product.name} | Coffee Shop`;
   const description = buildProductOgDescription(product);
   const ogImage = resolveProductOgImage(product, baseUrl, id);
+  const fbAppId = process.env.NEXT_PUBLIC_FB_APP_ID?.trim();
+  const priceAmount = Number(product.price ?? 0).toFixed(2);
+
+  const otherMetadata: Record<string, string> = {
+    'og:type': 'product',
+    'product:price:amount': priceAmount,
+    'product:price:currency': 'USD',
+  };
+
+  if (fbAppId) {
+    otherMetadata['fb:app_id'] = fbAppId;
+  }
 
   return {
     title,
@@ -65,6 +51,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     alternates: {
       canonical: productUrl,
     },
+    robots: getRobotsDirective(),
     openGraph: {
       title,
       description,
@@ -75,6 +62,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       images: [
         {
           url: ogImage.url,
+          secureUrl: ogImage.url.startsWith('https://') ? ogImage.url : undefined,
+          type: 'image/png',
           width: ogImage.width,
           height: ogImage.height,
           alt: ogImage.alt,
@@ -87,28 +76,53 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       description,
       images: [ogImage.url],
     },
+    other: otherMetadata,
   };
 }
 
 export default async function ProductDetailPage({ params }: PageProps) {
   const { id } = await params;
-  const baseUrl = (
-    process.env.PUBLIC_BASE_URL ||
-    process.env.NEXT_PUBLIC_BASE_URL ||
-    'http://localhost:3000'
-  ).replace(/\/$/, '');
-  const canonicalUrl = `${baseUrl}/products/${encodeURIComponent(id)}`;
+  const canonicalUrl = buildCanonicalProductUrl(id);
 
   const { status, product } = await fetchProductServer(id);
-  if (status === 404) {
+  if (status === 404 || !product) {
     notFound();
   }
 
+  const baseUrl = getSiteUrl();
+  const ogImage = resolveProductOgImage(product, baseUrl, id);
+
+  const productJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: product.name,
+    description: product.description || `Order ${product.name} at Coffee Shop. Fast, seamless payments via Bakong KHQR.`,
+    image: [ogImage.url],
+    sku: `PROD-${product.id}`,
+    category: product.category?.name || 'Coffee & Bakery',
+    offers: {
+      '@type': 'Offer',
+      price: Number(product.price ?? 0).toFixed(2),
+      priceCurrency: 'USD',
+      availability:
+        product.is_active && product.stock_quantity > 0
+          ? 'https://schema.org/InStock'
+          : 'https://schema.org/OutOfStock',
+      url: canonicalUrl,
+    },
+  };
+
   return (
-    <ProductDetailClient
-      productId={Number(id)}
-      canonicalUrl={canonicalUrl}
-      initialProduct={product ?? undefined}
-    />
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: safeJsonLdStringify(productJsonLd) }}
+      />
+      <ProductDetailClient
+        productId={Number(id)}
+        canonicalUrl={canonicalUrl}
+        initialProduct={product ?? undefined}
+      />
+    </>
   );
 }

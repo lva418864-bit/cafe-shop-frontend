@@ -1,27 +1,91 @@
-'use client';
+import type { Metadata } from 'next';
+import { siteConfig } from '@/config/site';
+import { absoluteUrl, getRobotsDirective, getSiteUrl } from '@/lib/site';
+import { safeJsonLdStringify } from '@/lib/jsonLd';
+import { HomeClient } from '@/app/home-client';
 
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+const siteUrl = getSiteUrl();
+const canonicalUrl = absoluteUrl('/');
+const ogImageUrl = absoluteUrl('/images/product-og.png');
 
-import { Spinner } from '@/components/ui/spinner';
-import { ROUTES } from '@/constants/routes';
-import { hasAnyRole } from '@/constants/roles';
-import { useAuthStore } from '@/store/authStore';
+export const metadata: Metadata = {
+  title: siteConfig.defaultTitle,
+  description: siteConfig.description,
+  alternates: {
+    canonical: canonicalUrl,
+  },
+  robots: getRobotsDirective(),
+  openGraph: {
+    title: siteConfig.defaultTitle,
+    description: siteConfig.description,
+    url: canonicalUrl,
+    siteName: siteConfig.name,
+    locale: siteConfig.locale,
+    type: 'website',
+    images: [
+      {
+        url: ogImageUrl,
+        secureUrl: ogImageUrl.startsWith('https://') ? ogImageUrl : undefined,
+        type: 'image/png',
+        width: 1200,
+        height: 630,
+        alt: siteConfig.name,
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: siteConfig.defaultTitle,
+    description: siteConfig.description,
+    images: [ogImageUrl],
+  },
+};
 
 export default function Home() {
-  const router = useRouter();
-  const user = useAuthStore((s) => s.user);
+  const websiteJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: siteConfig.name,
+    url: siteUrl,
+    description: siteConfig.description,
+    potentialAction: {
+      '@type': 'SearchAction',
+      target: {
+        '@type': 'EntryPoint',
+        urlTemplate: `${siteUrl}/products?q={search_term_string}`,
+      },
+      'query-input': 'required name=search_term_string',
+    },
+  };
 
-  useEffect(() => {
-    // Guests and customers land directly on the public shop catalog (/products);
-    // staff/admin go to /dashboard once hydrated.
-    const landing = hasAnyRole(user?.role, ['admin', 'staff']) ? ROUTES.DASHBOARD : ROUTES.PRODUCTS;
-    router.replace(landing);
-  }, [router, user]);
+  const organizationJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: siteConfig.name,
+    url: siteUrl,
+    logo: ogImageUrl,
+  };
 
   return (
-    <div className="bg-background flex min-h-screen items-center justify-center">
-      <Spinner label="Redirecting..." />
-    </div>
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: safeJsonLdStringify(websiteJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: safeJsonLdStringify(organizationJsonLd) }}
+      />
+      <h1 className="sr-only">Coffee Shop Specialty Coffee &amp; Bakery</h1>
+      <noscript>
+        <div className="p-8 text-center">
+          <p className="text-lg">Welcome to Coffee Shop. Please proceed to the menu:</p>
+          <a href="/products" className="text-roast-600 underline">
+            Browse our full coffee and bakery catalog
+          </a>
+        </div>
+      </noscript>
+      <HomeClient />
+    </>
   );
 }
