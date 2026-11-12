@@ -170,11 +170,11 @@ export default function CheckoutPage() {
               />
             </div>
 
-            <div className="flex flex-wrap justify-end gap-2 pt-2">
-              <Button variant="outline" asChild>
+            <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-2">
+              <Button variant="outline" asChild className="w-full sm:w-auto">
                 <Link href={ROUTES.PRODUCTS}>Continue shopping</Link>
               </Button>
-              <Button onClick={handlePlaceOrder} isLoading={checkout.isPending}>
+              <Button onClick={handlePlaceOrder} isLoading={checkout.isPending} className="w-full sm:w-auto">
                 Place Order &amp; Pay ({formatCurrency(total)})
               </Button>
             </div>

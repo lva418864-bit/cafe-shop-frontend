@@ -131,7 +131,7 @@ export function ProductsClient() {
             placeholder="Search products..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="border-input bg-surface text-foreground placeholder:text-foreground/40 focus-visible:ring-ring h-10 w-full rounded-md border px-3 text-sm focus-visible:outline-none focus-visible:ring-2 sm:max-w-xs"
+            className="border-input bg-surface text-foreground placeholder:text-foreground/40 focus-visible:ring-ring h-11 md:h-10 w-full rounded-md border px-3 text-base sm:text-sm focus-visible:outline-none focus-visible:ring-2 sm:max-w-xs"
           />
           <div className="w-full sm:w-48">
             <SelectField
@@ -165,8 +165,8 @@ export function ProductsClient() {
       </div>
 
       {isPending ? (
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {Array.from({ length: 6 }).map((_, i) => (
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {Array.from({ length: 8 }).map((_, i) => (
             <Skeleton key={i} className="h-64 w-full" />
           ))}
         </div>
@@ -195,12 +195,13 @@ export function ProductsClient() {
         />
       ) : (
         <>
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {filteredAndSorted.map((product) => (
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {filteredAndSorted.map((product, index) => (
               <ProductCard
                 key={product.id}
                 product={product}
                 canManage={canManage}
+                priority={index === 0}
                 onAdjustStock={() => setStockTarget(product)}
                 onDeactivate={() => setDeactivateTarget(product)}
               />

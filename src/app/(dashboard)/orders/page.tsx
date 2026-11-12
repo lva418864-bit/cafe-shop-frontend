@@ -134,77 +134,140 @@ export default function OrdersPage() {
         />
       ) : (
         <>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Order</TableHead>
-                {isStaff && <TableHead>Customer</TableHead>}
-                <TableHead>
-                  <button
-                    onClick={() => toggleSort('created_at')}
-                    className="hover:text-foreground flex items-center gap-1"
-                  >
-                    Date {sortIcon('created_at')}
-                  </button>
-                </TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>
-                  <button
-                    onClick={() => toggleSort('total_amount')}
-                    className="hover:text-foreground flex items-center gap-1"
-                  >
-                    Total {sortIcon('total_amount')}
-                  </button>
-                </TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {visibleItems.map((order) => {
-                const isOwner = order.user_id === user?.id;
-                const canPay = order.status === 'pending' && (isOwner || isStaff);
-                const canCancel = order.status === 'pending' && isOwner;
+          {/* Mobile Card List (below 768px) */}
+          <div className="space-y-3 md:hidden">
+            {visibleItems.map((order) => {
+              const isOwner = order.user_id === user?.id;
+              const canPay = order.status === 'pending' && (isOwner || isStaff);
+              const canCancel = order.status === 'pending' && isOwner;
 
-                return (
-                  <TableRow key={order.id}>
-                    <TableCell className="font-mono">
-                      <Link href={ROUTES.orderDetail(order.id)} className="hover:underline">
-                        #{order.id}
-                      </Link>
-                    </TableCell>
-                    {isStaff && <TableCell className="font-mono">{order.user_id}</TableCell>}
-                    <TableCell className="text-sm">{formatDateTime(order.created_at)}</TableCell>
-                    <TableCell>
-                      <OrderStatusBadge status={order.status} />
-                    </TableCell>
-                    <TableCell className="font-mono">
+              return (
+                <div
+                  key={order.id}
+                  className="border-border bg-surface rounded-lg border p-4 space-y-3 shadow-xs"
+                >
+                  <div className="flex items-center justify-between">
+                    <Link
+                      href={ROUTES.orderDetail(order.id)}
+                      className="font-mono text-base font-semibold hover:underline"
+                    >
+                      Order #{order.id}
+                    </Link>
+                    <OrderStatusBadge status={order.status} />
+                  </div>
+
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-foreground/60">{formatDateTime(order.created_at)}</span>
+                    <span className="font-mono font-medium text-base">
                       {formatCurrency(order.total_amount)}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <Button variant="ghost" size="sm" asChild>
-                        <Link href={ROUTES.orderDetail(order.id)}>View</Link>
+                    </span>
+                  </div>
+
+                  {isStaff && (
+                    <div className="text-xs text-foreground/50">
+                      Customer ID: <span className="font-mono">{order.user_id}</span>
+                    </div>
+                  )}
+
+                  <div className="border-border border-t pt-2 flex items-center justify-end gap-2">
+                    <Button variant="outline" size="sm" asChild>
+                      <Link href={ROUTES.orderDetail(order.id)}>View</Link>
+                    </Button>
+                    {canPay && (
+                      <Button size="sm" onClick={() => setPayTarget(order)}>
+                        Pay
                       </Button>
-                      {canPay && (
-                        <Button variant="ghost" size="sm" onClick={() => setPayTarget(order)}>
-                          Pay
+                    )}
+                    {canCancel && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-brick-600"
+                        onClick={() => setCancelTarget(order)}
+                      >
+                        Cancel
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Desktop Table (768px and up) */}
+          <div className="hidden md:block">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Order</TableHead>
+                  {isStaff && <TableHead>Customer</TableHead>}
+                  <TableHead>
+                    <button
+                      onClick={() => toggleSort('created_at')}
+                      className="hover:text-foreground flex items-center gap-1"
+                    >
+                      Date {sortIcon('created_at')}
+                    </button>
+                  </TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>
+                    <button
+                      onClick={() => toggleSort('total_amount')}
+                      className="hover:text-foreground flex items-center gap-1"
+                    >
+                      Total {sortIcon('total_amount')}
+                    </button>
+                  </TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {visibleItems.map((order) => {
+                  const isOwner = order.user_id === user?.id;
+                  const canPay = order.status === 'pending' && (isOwner || isStaff);
+                  const canCancel = order.status === 'pending' && isOwner;
+
+                  return (
+                    <TableRow key={order.id}>
+                      <TableCell className="font-mono">
+                        <Link href={ROUTES.orderDetail(order.id)} className="hover:underline">
+                          #{order.id}
+                        </Link>
+                      </TableCell>
+                      {isStaff && <TableCell className="font-mono">{order.user_id}</TableCell>}
+                      <TableCell className="text-sm">{formatDateTime(order.created_at)}</TableCell>
+                      <TableCell>
+                        <OrderStatusBadge status={order.status} />
+                      </TableCell>
+                      <TableCell className="font-mono">
+                        {formatCurrency(order.total_amount)}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Button variant="ghost" size="sm" asChild>
+                          <Link href={ROUTES.orderDetail(order.id)}>View</Link>
                         </Button>
-                      )}
-                      {canCancel && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="text-brick-600"
-                          onClick={() => setCancelTarget(order)}
-                        >
-                          Cancel
-                        </Button>
-                      )}
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
+                        {canPay && (
+                          <Button variant="ghost" size="sm" onClick={() => setPayTarget(order)}>
+                            Pay
+                          </Button>
+                        )}
+                        {canCancel && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-brick-600"
+                            onClick={() => setCancelTarget(order)}
+                          >
+                            Cancel
+                          </Button>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </div>
 
           {data && <Pagination {...data.meta} onPageChange={setPage} className="mt-4" />}
         </>

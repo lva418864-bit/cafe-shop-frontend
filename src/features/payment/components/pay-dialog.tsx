@@ -170,13 +170,16 @@ export function PayDialog({ orderId, totalAmount, open, onOpenChange }: PayDialo
                   {isExpired ? 'QR Expired' : `Expires in ${formatCountdown(secondsLeft)}`}
                 </Badge>
 
-                {/* Rendered standard 2D EMVCo KHQR code */}
-                <div className="bg-white p-3 rounded-md shadow-inner border border-neutral-200 flex flex-col items-center justify-center">
+                {/* Rendered standard 2D EMVCo KHQR code with official quiet zone and high contrast */}
+                <div className="bg-white p-3 sm:p-4 rounded-lg shadow-sm border border-neutral-300 flex flex-col items-center justify-center max-w-[260px] sm:max-w-[280px] w-full aspect-square mx-auto">
                   <QRCodeSVG
                     value={payment.qr_string ?? ''}
-                    size={192}
+                    size={240}
                     level="M"
-                    includeMargin={false}
+                    fgColor="#000000"
+                    bgColor="#FFFFFF"
+                    includeMargin={true}
+                    className="w-full h-full object-contain"
                     aria-label="Bakong KHQR Code"
                   />
                 </div>

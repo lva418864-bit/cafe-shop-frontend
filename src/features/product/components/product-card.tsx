@@ -25,6 +25,7 @@ export interface ProductCardProps {
   canManage: boolean;
   onAdjustStock: (product: ProductResponse) => void;
   onDeactivate: (product: ProductResponse) => void;
+  priority?: boolean;
 }
 
 /**
@@ -36,7 +37,13 @@ export interface ProductCardProps {
  * "Add to Cart" only shows for customers (!canManage) - staff/admin get the
  * management menu instead, not a cart action.
  */
-export function ProductCard({ product, canManage, onAdjustStock, onDeactivate }: ProductCardProps) {
+export function ProductCard({
+  product,
+  canManage,
+  onAdjustStock,
+  onDeactivate,
+  priority = false,
+}: ProductCardProps) {
   const isLowStock = product.stock_quantity <= 5 && product.is_active;
   const isOutOfStock = product.stock_quantity <= 0;
 
@@ -75,8 +82,9 @@ export function ProductCard({ product, canManage, onAdjustStock, onDeactivate }:
               alt={product.image_alt || product.name}
               width={360}
               height={360}
-              loading="lazy"
+              loading={priority ? 'eager' : 'lazy'}
               decoding="async"
+              fetchPriority={priority ? 'high' : 'auto'}
               className="h-full w-full object-cover"
             />
           ) : (
