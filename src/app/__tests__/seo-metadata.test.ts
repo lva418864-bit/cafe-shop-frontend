@@ -143,8 +143,8 @@ describe('SEO & Metadata Foundation', () => {
 
       const items = await sitemap();
       expect(items).toHaveLength(2);
-      expect(items[0].url).toBe('https://coffeeshop.kh/');
-      expect(items[1].url).toBe('https://coffeeshop.kh/products');
+      expect(items[0]?.url).toBe('https://coffeeshop.kh/');
+      expect(items[1]?.url).toBe('https://coffeeshop.kh/products');
     });
   });
 
