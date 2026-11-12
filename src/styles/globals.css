@@ -5,8 +5,8 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-  --font-display: var(--font-fraunces), Georgia, serif;
-  --font-sans: var(--font-plex-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-fraunces), Georgia, 'Hanuman', 'Khmer OS Muol Light', serif;
+  --font-sans: var(--font-plex-sans), 'Kantumruy Pro', 'Hanuman', 'Khmer OS Battambang', 'Khmer OS', ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-plex-mono), ui-monospace, monospace;
 
   /* Base surfaces */
@@ -68,10 +68,22 @@
     border-color: var(--color-border);
   }
 
+  html {
+    max-width: 100vw;
+    overflow-x: hidden;
+    scroll-behavior: smooth;
+  }
+
   body {
+    max-width: 100vw;
+    min-height: 100dvh;
+    overflow-x: hidden;
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-sans);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   /* Visible keyboard focus everywhere - never remove outline without replacing it. */

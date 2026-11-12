@@ -3,7 +3,7 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { LogIn, LogOut, Menu, Moon, Search, ShoppingCart, Sun, User as UserIcon } from 'lucide-react';
+import { LogIn, LogOut, Menu, Moon, Search, ShoppingCart, Sun, User as UserIcon, X } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -49,8 +49,13 @@ export function Navbar({
 
   const cartCount = useCartStore((s) => s.items.reduce((sum, item) => sum + item.quantity, 0));
   const [cartOpen, setCartOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const [searchQuery, setSearchQuery] = useState('');
+
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [pathname]);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -84,10 +89,22 @@ export function Navbar({
     <header className="border-border bg-surface border-b">
       <div className="flex h-16 items-center gap-4 px-4 lg:px-6">
         {isCustomerOrGuest ? (
-          <Link href={ROUTES.PRODUCTS} className="font-display text-foreground shrink-0 text-lg">
-            <span className="sm:hidden">Coffee</span>
-            <span className="hidden sm:inline">Coffee Shop</span>
-          </Link>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="md:hidden"
+              onClick={() => setMobileMenuOpen((open) => !open)}
+              aria-expanded={mobileMenuOpen}
+              aria-label={mobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+            >
+              {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </Button>
+            <Link href={ROUTES.PRODUCTS} className="font-display text-foreground shrink-0 text-lg">
+              <span className="sm:hidden">Coffee</span>
+              <span className="hidden sm:inline">Coffee Shop</span>
+            </Link>
+          </div>
         ) : (
           <Button
             variant="ghost"
@@ -204,6 +221,55 @@ export function Navbar({
           )}
         </div>
       </div>
+
+      {isCustomerOrGuest && mobileMenuOpen && (
+        <div
+          role="region"
+          aria-label="Mobile navigation menu"
+          className="border-border bg-surface border-t px-4 py-3 md:hidden shadow-lg animate-in slide-in-from-top-2"
+        >
+          <nav className="flex flex-col gap-1">
+            {navItems.map((item) => {
+              const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
+              const Icon = item.icon;
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={cn(
+                    'flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors',
+                    isActive
+                      ? 'bg-roast-600 text-white'
+                      : 'text-foreground/80 hover:bg-roast-50 hover:text-foreground dark:hover:bg-roast-900/40',
+                  )}
+                >
+                  <Icon className="h-4 w-4" />
+                  <span>{item.label}</span>
+                </Link>
+              );
+            })}
+            <button
+              type="button"
+              onClick={() => {
+                setMobileMenuOpen(false);
+                setCartOpen(true);
+              }}
+              className="flex items-center justify-between rounded-md px-3 py-2.5 text-sm font-medium text-foreground/80 hover:bg-roast-50 dark:hover:bg-roast-900/40 text-left"
+            >
+              <span className="flex items-center gap-3">
+                <ShoppingCart className="h-4 w-4" />
+                <span>Cart</span>
+              </span>
+              {cartCount > 0 && (
+                <span className="bg-brick-500 rounded-full px-2 py-0.5 font-mono text-xs text-white">
+                  {cartCount} item{cartCount === 1 ? '' : 's'}
+                </span>
+              )}
+            </button>
+          </nav>
+        </div>
+      )}
 
       {isCustomerOrGuest && <CartDialog open={cartOpen} onOpenChange={setCartOpen} />}
     </header>

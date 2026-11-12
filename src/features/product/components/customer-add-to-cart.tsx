@@ -181,10 +181,10 @@ export function CustomerAddToCart({ product }: { product: ProductResponse }) {
         </Card>
       ))}
 
-      <div className="space-y-3">
-        <div className="flex flex-col gap-2 sm:flex-row">
+      <div className="fixed bottom-0 left-0 right-0 z-30 border-t border-border bg-surface/95 p-3 backdrop-blur shadow-lg sm:static sm:border-0 sm:bg-transparent sm:p-0 sm:shadow-none sm:backdrop-blur-none pb-[calc(0.75rem+env(safe-area-inset-bottom))] sm:pb-0">
+        <div className="mx-auto flex max-w-4xl flex-col gap-2 sm:flex-row">
           <Button
-            className="flex-1"
+            className="flex-1 w-full sm:w-auto h-11"
             size="lg"
             disabled={!isValid}
             onClick={handleAddToCart}
@@ -194,7 +194,7 @@ export function CustomerAddToCart({ product }: { product: ProductResponse }) {
           </Button>
           <Button
             variant="outline"
-            className="flex-1"
+            className="flex-1 w-full sm:w-auto h-11"
             size="lg"
             disabled={!isValid && cartCount === 0}
             onClick={handleOrderNow}

@@ -103,64 +103,120 @@ export default function OrderDetailPage() {
               <span className="text-foreground/50 text-sm">{formatDateTime(order.created_at)}</span>
             </div>
 
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Product</TableHead>
-                  <TableHead>Unit price</TableHead>
-                  <TableHead>Qty</TableHead>
-                  <TableHead className="text-right">Subtotal</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {order.items.map((item) => {
-                  const resolvedImg = resolveProductImageUrl(item.product_image_url);
-                  return (
-                    <TableRow key={item.id}>
-                      <TableCell>
-                        <div className="flex items-center gap-3">
-                          <div className="bg-muted flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-md border">
-                            {resolvedImg ? (
-                              // eslint-disable-next-line @next/next/no-img-element
-                              <img
-                                src={resolvedImg}
-                                alt={item.product_image_alt || item.product_name}
-                                width={40}
-                                height={40}
-                                loading="lazy"
-                                className="h-full w-full object-cover"
-                              />
-                            ) : (
-                              <Coffee className="text-foreground/40 h-5 w-5" aria-hidden="true" />
-                            )}
-                          </div>
-                          <div>
-                            <div>{item.product_name}</div>
-                            {item.customizations && item.customizations.length > 0 && (
-                              <div className="text-muted-foreground mt-1 space-y-0.5 text-xs">
-                                {item.customizations.map((c) => (
-                                  <div key={c.id}>
-                                    • {c.group_name}: {c.option_name}
-                                    {parseDecimal(c.extra_price) > 0
-                                      ? ` (+${formatCurrency(c.extra_price)})`
-                                      : ''}
-                                  </div>
-                                ))}
-                              </div>
-                            )}
-                          </div>
+            {/* Mobile Order Items (stacked cards) */}
+            <div className="space-y-3 sm:hidden">
+              {order.items.map((item) => {
+                const resolvedImg = resolveProductImageUrl(item.product_image_url);
+                return (
+                  <div
+                    key={item.id}
+                    className="border-border bg-surface rounded-lg border p-3 space-y-2 text-sm"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="bg-muted flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-md border">
+                        {resolvedImg ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={resolvedImg}
+                            alt={item.product_image_alt || item.product_name}
+                            width={44}
+                            height={44}
+                            loading="lazy"
+                            className="h-full w-full object-cover"
+                          />
+                        ) : (
+                          <Coffee className="text-foreground/40 h-5 w-5" aria-hidden="true" />
+                        )}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="font-medium truncate">{item.product_name}</div>
+                        <div className="text-foreground/60 text-xs font-mono">
+                          {formatCurrency(item.unit_price)} × {item.quantity}
                         </div>
-                      </TableCell>
-                      <TableCell className="font-mono">{formatCurrency(item.unit_price)}</TableCell>
-                      <TableCell className="font-mono">{item.quantity}</TableCell>
-                      <TableCell className="text-right font-mono">
+                      </div>
+                      <div className="font-mono font-medium text-right">
                         {formatCurrency(item.subtotal)}
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
+                      </div>
+                    </div>
+
+                    {item.customizations && item.customizations.length > 0 && (
+                      <div className="text-muted-foreground ml-14 space-y-0.5 text-xs">
+                        {item.customizations.map((c) => (
+                          <div key={c.id}>
+                            • {c.group_name}: {c.option_name}
+                            {parseDecimal(c.extra_price) > 0
+                              ? ` (+${formatCurrency(c.extra_price)})`
+                              : ''}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Desktop Order Items (Table) */}
+            <div className="hidden sm:block">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Product</TableHead>
+                    <TableHead>Unit price</TableHead>
+                    <TableHead>Qty</TableHead>
+                    <TableHead className="text-right">Subtotal</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {order.items.map((item) => {
+                    const resolvedImg = resolveProductImageUrl(item.product_image_url);
+                    return (
+                      <TableRow key={item.id}>
+                        <TableCell>
+                          <div className="flex items-center gap-3">
+                            <div className="bg-muted flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-md border">
+                              {resolvedImg ? (
+                                // eslint-disable-next-line @next/next/no-img-element
+                                <img
+                                  src={resolvedImg}
+                                  alt={item.product_image_alt || item.product_name}
+                                  width={40}
+                                  height={40}
+                                  loading="lazy"
+                                  className="h-full w-full object-cover"
+                                />
+                              ) : (
+                                <Coffee className="text-foreground/40 h-5 w-5" aria-hidden="true" />
+                              )}
+                            </div>
+                            <div>
+                              <div>{item.product_name}</div>
+                              {item.customizations && item.customizations.length > 0 && (
+                                <div className="text-muted-foreground mt-1 space-y-0.5 text-xs">
+                                  {item.customizations.map((c) => (
+                                    <div key={c.id}>
+                                      • {c.group_name}: {c.option_name}
+                                      {parseDecimal(c.extra_price) > 0
+                                        ? ` (+${formatCurrency(c.extra_price)})`
+                                        : ''}
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </TableCell>
+                        <TableCell className="font-mono">{formatCurrency(item.unit_price)}</TableCell>
+                        <TableCell className="font-mono">{item.quantity}</TableCell>
+                        <TableCell className="text-right font-mono">
+                          {formatCurrency(item.subtotal)}
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </div>
 
             <div className="border-border flex items-center justify-between border-t pt-4">
               <span className="text-foreground text-sm font-medium">Total</span>

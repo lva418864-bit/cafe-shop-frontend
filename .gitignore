@@ -9,6 +9,7 @@
 # Dependencies & Build
 node_modules/
 .next/
+.netlify/
 out/
 build/
 dist/

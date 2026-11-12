@@ -35,8 +35,10 @@ async function serveDefaultFallbackImage(): Promise<Response> {
 export async function GET(_request: Request, { params }: RouteContext): Promise<Response> {
   const { id } = await params;
   const internalApi = (
-    process.env.KONG_INTERNAL_URL ||
     process.env.INTERNAL_API_BASE_URL ||
+    process.env.KONG_INTERNAL_URL ||
+    process.env.NEXT_PUBLIC_API_BASE_URL ||
+    process.env.NEXT_PUBLIC_API_URL ||
     'http://kong:8000'
   ).replace(/\/$/, '');
 
@@ -165,6 +167,7 @@ export async function GET(_request: Request, { params }: RouteContext): Promise<
             }}
           >
             {photoDataUri ? (
+              // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={photoDataUri}
                 alt={product.name}
