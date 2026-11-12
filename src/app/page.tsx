@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { siteConfig } from '@/config/site';
 import { absoluteUrl, getRobotsDirective, getSiteUrl } from '@/lib/site';
 import { safeJsonLdStringify } from '@/lib/jsonLd';
@@ -80,9 +81,9 @@ export default function Home() {
       <noscript>
         <div className="p-8 text-center">
           <p className="text-lg">Welcome to Coffee Shop. Please proceed to the menu:</p>
-          <a href="/products" className="text-roast-600 underline">
+          <Link href="/products" className="text-roast-600 underline">
             Browse our full coffee and bakery catalog
-          </a>
+          </Link>
         </div>
       </noscript>
       <HomeClient />

@@ -167,6 +167,7 @@ export async function GET(_request: Request, { params }: RouteContext): Promise<
             }}
           >
             {photoDataUri ? (
+              // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={photoDataUri}
                 alt={product.name}
