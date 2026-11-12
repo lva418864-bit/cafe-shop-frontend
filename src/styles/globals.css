@@ -5,8 +5,8 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-  --font-display: var(--font-fraunces), Georgia, serif;
-  --font-sans: var(--font-plex-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-fraunces), Georgia, 'Hanuman', 'Khmer OS Muol Light', serif;
+  --font-sans: var(--font-plex-sans), 'Kantumruy Pro', 'Hanuman', 'Khmer OS Battambang', 'Khmer OS', ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-plex-mono), ui-monospace, monospace;
 
   /* Base surfaces */

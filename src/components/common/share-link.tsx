@@ -6,6 +6,7 @@ import { AlertCircle, Check, Share2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/useToast';
 import { cn } from '@/lib/utils';
+import { buildCanonicalProductUrl } from '@/lib/site';
 
 export interface ShareLinkProps {
   productId?: number | string;
@@ -15,35 +16,7 @@ export interface ShareLinkProps {
   className?: string;
 }
 
-/**
- * Builds a clean canonical product URL from PUBLIC_BASE_URL / NEXT_PUBLIC_BASE_URL
- * without query strings, fragments, tokens, or tracking parameters.
- */
-export function buildCanonicalProductUrl(
-  productId?: number | string,
-  explicitUrl?: string,
-): string {
-  if (explicitUrl && explicitUrl.trim()) {
-    const withoutQuery = explicitUrl.trim().split('?')[0] ?? '';
-    const cleanExplicit = withoutQuery.split('#')[0] ?? '';
-    return cleanExplicit.replace(/\/$/, '');
-  }
-  const configuredBase = (
-    process.env.PUBLIC_BASE_URL ||
-    process.env.NEXT_PUBLIC_BASE_URL ||
-    (typeof window !== 'undefined' ? window.location.origin : '') ||
-    'http://localhost:3000'
-  ).replace(/\/$/, '');
-
-  if (productId !== undefined && productId !== null && String(productId).trim() !== '') {
-    return `${configuredBase}/products/${encodeURIComponent(String(productId).trim())}`;
-  }
-
-  if (typeof window !== 'undefined') {
-    return `${configuredBase}${window.location.pathname}`.replace(/\/$/, '');
-  }
-  return configuredBase;
-}
+export { buildCanonicalProductUrl };
 
 /**
  * Builds short share text that never contains the URL so chat apps do not

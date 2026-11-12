@@ -1,9 +1,11 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Fraunces, IBM_Plex_Mono, IBM_Plex_Sans } from 'next/font/google';
 import '@/styles/globals.css';
 
 import { Toaster } from '@/components/ui/toaster';
 import { Providers } from '@/app/providers';
+import { siteConfig } from '@/config/site';
+import { getRobotsDirective, getSiteUrl } from '@/lib/site';
 
 // Display face, used sparingly for page titles - carries the "craft" side
 // of a coffee business.
@@ -31,9 +33,56 @@ const plexMono = IBM_Plex_Mono({
   display: 'swap',
 });
 
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: siteConfig.themeColor },
+    { media: '(prefers-color-scheme: dark)', color: '#1c1613' },
+  ],
+};
+
+const siteUrl = getSiteUrl();
+
 export const metadata: Metadata = {
-  title: 'Coffee Shop Console',
-  description: 'Operations console for the Coffee Shop microservices platform.',
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: siteConfig.defaultTitle,
+    template: siteConfig.titleTemplate,
+  },
+  description: siteConfig.description,
+  applicationName: siteConfig.name,
+  authors: [{ name: siteConfig.name }],
+  creator: siteConfig.name,
+  publisher: siteConfig.name,
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  openGraph: {
+    type: 'website',
+    siteName: siteConfig.name,
+    locale: siteConfig.locale,
+    url: siteUrl,
+    title: siteConfig.defaultTitle,
+    description: siteConfig.description,
+    images: [
+      {
+        url: '/images/product-og.png',
+        width: 1200,
+        height: 630,
+        alt: siteConfig.name,
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: siteConfig.defaultTitle,
+    description: siteConfig.description,
+    images: ['/images/product-og.png'],
+  },
+  robots: getRobotsDirective(),
 };
 
 // Runs before React hydrates, so the correct theme class is already on
